@@ -1,5 +1,6 @@
 2 #numInputs
-8 #numHiddens
+8 #numHiddens1
+8 #numHiddens2
 3 #numOutputs
 0.3 #lambda
 100000 #maxIterations
