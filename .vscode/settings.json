@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+	],
+	"java.format.settings.url": "/Users/24IshaK/Downloads/eclipse-java-google-style.xml",
+	"[java]": {
+		"editor.insertSpaces": true
+	}
+}
