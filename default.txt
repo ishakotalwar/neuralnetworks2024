@@ -1,6 +1,8 @@
 2 #numInputs
-20 #numHiddens
+20 #numHiddens1
+30 #numHiddens2
 3 #numOutputs
+4 #numLayers
 0.3 #lambda
 100000 #maxIterations
 training #trainingOrRunning

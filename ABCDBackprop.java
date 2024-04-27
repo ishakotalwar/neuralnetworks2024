@@ -137,7 +137,7 @@ public class ABCDBackprop
       }
       else
       {
-         System.out.println("No valid integer found!");
+         System.out.println("No valid integer found!" + inputString);
       }
 
       numberScanner.close();
@@ -183,7 +183,7 @@ public class ABCDBackprop
    public void readParametersFile(String inputFileName)
    {
       parametersFile = inputFileName;
-      File pFile = new File("/Users/24IshaK/Desktop/NeuralNetworksProjects/" + parametersFile);
+      File pFile = new File(parametersFile);
       Scanner sc = null;
       try
       {
@@ -223,16 +223,32 @@ public class ABCDBackprop
       {
          PrintWriter pw = new PrintWriter(new FileOutputStream(new File(weightsFile), false));
 
-         for (int k = 0; k < numInputs; k++)
+         for (int k = 0; k < numLayers; k++)
          {
-            for (int j = 0; j < numHiddens1; j++)
+            for (int j = 0; j < numInputs && k == 0; j++)
+            {
+               for (int i = 0; i < numHiddens1; i++)
+               {
+                  pw.println(weights[k][j][i]);
+               }
+            }
+
+            for (int j = 0; j < numHiddens1 && k == 1; j++)
             {
                for (int i = 0; i < numHiddens2; i++)
                {
                   pw.println(weights[k][j][i]);
                }
             }
-         } // for (k = 0; k < nInputs; k++)
+
+            for (int j = 0; j < numHiddens2 && k == 2; j++)
+            {
+               for (int i = 0; i < numOutputs; i++)
+               {
+                  pw.println(weights[k][j][i]);
+               }
+            }
+         } // for (int k = 0; k < numLayers; k++)
          pw.close();
       } // try
       catch (Exception e) 
@@ -248,7 +264,7 @@ public class ABCDBackprop
    public void populate()
    {
       Scanner sc = null;
-      File pFile = new File("/Users/24IshaK/Desktop/NeuralNetworksProjects/" + parametersFile);
+      File pFile = new File(parametersFile);
       try
       {
          sc = new Scanner(pFile);
@@ -273,7 +289,7 @@ public class ABCDBackprop
       }
       sc.close();
 
-      File tFile = new File("/Users/24IshaK/Desktop/NeuralNetworksProjects/" + testcasesFile);
+      File tFile = new File(testcasesFile);
       try
       {
          sc = new Scanner(tFile);
@@ -297,7 +313,7 @@ public class ABCDBackprop
 
       if (randomOrSetWeights.equals("set"))
       {
-         File wFile = new File("/Users/24IshaK/Desktop/NeuralNetworksProjects/" + weightsFile);
+         File wFile = new File(weightsFile);
          try
          {
             sc = new Scanner(wFile);
@@ -441,8 +457,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][m][k] * activations[n][m];
          }
-         activations[HIDDEN1_LAYER][k] = sigmoidFunction(tempTheta);
-         theta[n][k] = tempTheta;
+         activations[n + 1][k] = sigmoidFunction(tempTheta);
       } // for (int k = 0; k < numInputs; k++)
 
       for (int j = 0; j < numHiddens2; j++)
@@ -454,8 +469,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][k][j] * activations[n][k];
          }
-         activations[HIDDEN2_LAYER][j] = sigmoidFunction(tempTheta);
-         theta[n][j] = tempTheta;
+         activations[n + 1][j] = sigmoidFunction(tempTheta);
       } // for (int j = 0; j < numHiddens; j++)
 
       for (int i = 0; i < numOutputs; i++)
@@ -467,7 +481,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][j][i] * activations[n][j];
          }
-         activations[OUTPUT_LAYER][i] = sigmoidFunction(tempTheta);
+         activations[n + 1][i] = sigmoidFunction(tempTheta);
       } // for (int i = 0; i < numOutputs; i++)
    } // public void runNetworkCalculations()
 
@@ -487,7 +501,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][m][k] * activations[n][m];
          }
-         activations[HIDDEN1_LAYER][k] = sigmoidFunction(tempTheta);
+         activations[n + 1][k] = sigmoidFunction(tempTheta);
          theta[n][k] = tempTheta;
       } // for (int k = 0; k < numInputs; k++)
 
@@ -500,7 +514,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][k][j] * activations[n][k];
          }
-         activations[HIDDEN2_LAYER][j] = sigmoidFunction(tempTheta);
+         activations[n + 1][j] = sigmoidFunction(tempTheta);
          theta[n][j] = tempTheta;
       } // for (int j = 0; j < numHiddens; j++)
 
@@ -513,7 +527,7 @@ public class ABCDBackprop
          {
             tempTheta += weights[n][j][i] * activations[n][j];
          }
-         activations[OUTPUT_LAYER][i] = sigmoidFunction(tempTheta);
+         activations[n + 1][i] = sigmoidFunction(tempTheta);
          bigOmega[i] = expectedTruthTable[index][i] - activations[n + 1][i];
          smallPsiI[i] = bigOmega[i] * sigmoidDerivative(tempTheta);
       } // for (int i = 0; i < numOutputs; i++)
@@ -530,7 +544,7 @@ public class ABCDBackprop
       for (int j = 0; j < numHiddens2; j++)
       {
          omegaJ = 0.0;
-         int n = 2;
+         int n = HIDDEN2_LAYER;
 
          for (int i = 0; i < numOutputs; i++)
          {
@@ -538,14 +552,14 @@ public class ABCDBackprop
             weights[n][j][i] += lambda * activations[n][j] * smallPsiI[i];
          } // for (int i = 0; i < numOutputs; i++)
 
-         bigPsiJ[j] = omegaJ * sigmoidDerivative(theta[n][j]);
+         bigPsiJ[j] = omegaJ * sigmoidDerivative(theta[n - 1][j]);
       } // for (int j = 0; j < numHiddens2; j++)
 
       for (int k = 0; k < numHiddens1; k++)
       {
          double bigPsiK;
          omegaK = 0.0;
-         int n = 1;
+         int n = HIDDEN1_LAYER;
 
          for (int j = 0; j < numHiddens2; j++)
          {
@@ -557,7 +571,7 @@ public class ABCDBackprop
 
          for (int m = 0; m < numInputs; m++)
          {
-            n = 0;
+            n = INPUT_LAYER;
             weights[n][m][k] += lambda * activations[n][m] * bigPsiK; 
          }
       } // for (int k = 0; k < numHiddens1; k++)
