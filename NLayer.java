@@ -438,8 +438,8 @@ public class NLayer
    } // public void populate()
 
    /*
-    * The method setInputs() initialized the input values for a given index.
-    */
+   * The method setInputs() initialized the input values for a given index.
+   */
    public void setInputs(int inputIndex)
    {
       int n = INPUT_LAYER;
@@ -507,11 +507,11 @@ public class NLayer
 
       for (int n = 0; n < numLayers - 1; n++)
       {
-         for (int k = 0; k < numNodesInLayer[n]; k++)
+         for (int k = 0; k < numNodesInLayer[n + 1]; k++)
          {
             tempTheta = 0.0;
 
-            for (int m = 0; m < numInputs; m++)
+            for (int m = 0; m < numNodesInLayer[n]; m++)
             {
                tempTheta += weights[n][m][k] * activations[n][m];
             }
@@ -527,7 +527,7 @@ public class NLayer
    {
       double tempTheta, tempOmega;
 
-      for (int n = 1; n < numLayers; n++)
+      for (int n = 1; n < numLayers - 1; n++)
       {
          for (int j = 0; j < numNodesInLayer[n]; j++)
          {
@@ -535,7 +535,7 @@ public class NLayer
 
             for (int i = 0; i < numNodesInLayer[n - 1]; i++)
             {
-               tempTheta = weights[n - 1][i][j] * activations[n - 1][i];
+               tempTheta += weights[n - 1][i][j] * activations[n - 1][i];
             }
             activations[n][j] = sigmoidFunction(tempTheta);
             theta[n][j] = tempTheta;
@@ -574,28 +574,27 @@ public class NLayer
             for (int i = 0; i < numNodesInLayer[n + 1]; i++)
             {
                tempOmega += psi[n + 1][i] * weights[n][j][i];
-               weights[n][j][i] += lambda * activations[n][j] * psi[n][i];
+               weights[n][j][i] += lambda * activations[n][j] * psi[n + 1][i];
             }
             psi[n][j] = tempOmega * sigmoidDerivative(theta[n][j]);
          }
       } // for (int n = numLayers - 2; n > 1; n--)
 
-      for (int m = 0; m < numNodesInLayer[0]; m++)
+      int x = INPUT_LAYER;
+      for (int m = 0; m < numNodesInLayer[x + 1]; m++)
       {
          tempOmega = 0.0;
-         int x = INPUT_LAYER + 1;
-         for (int k = 0; k < numNodesInLayer[x]; k++)
+         for (int k = 0; k < numNodesInLayer[x + 2]; k++)
          {
-            tempOmega = psi[x + 1][k] * weights[x][m][k];
-            weights[x][m][k] += lambda * activations[x][m] * psi[x + 1][k];
+            tempOmega += psi[x + 2][k] * weights[x + 1][m][k];
+            weights[x + 1][m][k] += lambda * activations[x + 1][m] * psi[x + 2][k];
          }
 
-         psi[x][m] = tempOmega * sigmoidDerivative(theta[x][m]);
+         psi[x + 1][m] = tempOmega * sigmoidDerivative(theta[x + 1][m]);
 
-         x = INPUT_LAYER;
          for (int k = 0; k < numInputs; k++)
          {
-            weights[x][m][k] += lambda * activations[x][m] * psi[x + 1][m];
+            weights[x][k][m] += lambda * activations[x][m] * psi[x + 1][m];
          }
       }
    } // public void backpropagation(int index)
@@ -611,9 +610,9 @@ public class NLayer
          setInputs(index);
          runNetworkCalculations();
 
+         int n = numLayers - 1;
          for (int i = 0; i < numOutputs; i++)
          {
-            int n = numLayers - 1;
             actualTruthTable[index][i] = activations[n][i];
          }
       } // for (int index = 0; index < numTestCases; index++)
