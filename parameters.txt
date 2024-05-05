@@ -11,9 +11,10 @@ random # randomOrSet
 80 #
 0.3 #lambda
 100000 #maxIterations
-0.1 #randomMin
+-1.5 #randomMin
 1.5 #randomMax
 2.0E-4 #errorThreshold
+10000 #keepAlive
 testcases.txt #testcases
 outputWeights.txt #savedWeights
 0 0 0

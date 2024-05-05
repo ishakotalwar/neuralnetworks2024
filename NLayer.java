@@ -50,6 +50,7 @@ public class NLayer
    public int iterations;
    public int maxNodes;
    public int offsetInFile;
+   public int keepAlive;
    public static final int INPUT_LAYER = 0;
 
    public double lambda;
@@ -120,8 +121,11 @@ public class NLayer
     */
    public void echoConfigParameters()
    {
-      networkConfiguration =
-            numInputs + "-" + numNodesInLayer[0] + "-" + numNodesInLayer[1] + "-" + numOutputs;
+      networkConfiguration = "" + numInputs;
+      for (int n = 1; n < numLayers; n++)
+      {
+         networkConfiguration += "-" + numNodesInLayer[n];
+      }
       System.out.println("Network Configuration: " + networkConfiguration);
       System.out.println("Training or running? " + trainingOrRunning);
       System.out.println("Randomize or set weights? " + randomOrSetWeights);
@@ -132,6 +136,7 @@ public class NLayer
          System.out.println("Maximum iterations: " + maxNumIterations);
          System.out.println("Error threshold: " + errorThreshold);
          System.out.println("Lambda value: " + lambda);
+         System.out.println("Keep alive: " + keepAlive);
       } // if (trainingOrRunning.equals("training"))
    } // public void echoConfigParameters()
 
@@ -257,10 +262,11 @@ public class NLayer
       randomMin = scanDouble(sc.nextLine());
       randomMax = scanDouble(sc.nextLine());
       errorThreshold = scanDouble(sc.nextLine());
+      keepAlive = scanInteger(sc.nextLine());
       testcasesFile = scanString(sc.nextLine());
       weightsFile = scanString(sc.nextLine());
       sc.close();
-      offsetInFile = numLayers + 11;
+      offsetInFile = numLayers + 12;
    } // public void readParametersFile(String inputFileName)
 
 
@@ -493,6 +499,11 @@ public class NLayer
          if (iterations >= maxNumIterations)
          {
             finished = true;
+         }
+
+         if (keepAlive > 0 && (iterations % keepAlive == 0)) 
+         {
+            System.out.printf("Iteration %d, Error = %f\n", iterations, avgError);
          }
       } // while (!finished)
       totalRunTime = System.currentTimeMillis() - startTime;
