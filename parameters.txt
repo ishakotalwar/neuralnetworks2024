@@ -1,16 +1,16 @@
-2 #numInputs
-5 #numHiddens1
-5 #numHiddens2
-3 #numOutputs
+training #trainingOrRunning
+random # randomOrSet
+4 #numTestCases
 4 #numLayers
+2 #numInputs
+3 #numOutputs
+1 #numHiddens1
+1 #numHiddens2
 0.3 #lambda
 100000 #maxIterations
-running #trainingOrRunning
-set # randomOrSet
 0.1 #randomMin
 1.5 #randomMax
 2.0E-4 #errorThreshold
-4 #numTestCases
 testcases.txt #testcases
 outputWeights.txt #savedWeights
 0 0 0
