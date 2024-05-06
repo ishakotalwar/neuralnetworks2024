@@ -9,34 +9,41 @@ import java.io.IOException;
  * 
  * @version 04/28/2024
  * 
- * This A-B-C-D perceptron is based on the previous A-B-C backpropagation project and the document
- * "4-Three Layer Network." There are two hidden layers. It can train a network based on set weights
- * provided by the user or randomized weights. The parameters are given to the network through an
- * external configuration file. The network trains through backpropagation.
+ * This N-Layer perceptron is based on the previous A-B-C-D backpropagation project and the document
+ * "5 - N-Layer Network." The user determines how many hidden layers there are. It can train 
+ * a network based on set weights provided by the user or randomized weights. 
+ * The parameters are given to the network through an external configuration file. 
+ * The network trains through backpropagation.
  * 
- * Table of Contents: - trainOrRun() determines whether the network is training or simply running. -
- * init() allocates space for aand initializes all of the arrays the network uses. -
- * echoConfigParameters() prints out the network configuration and other important parameters. -
- * scanInteger() takes in a String from an external file and returns an integer if present. -
- * scanDouble() takes in a String from an external file and returns a double if present. -
- * scanString() takes in a String from an external file, trims the whitespace and returns the
- * desired part of the String. - readParametersFile() goes through the external configuration file
- * and stores everything in variables. - saveWeightsFile() saves the final weights from training
- * into an external file. - populate() fills up the truth table and the weights array with either
- * random or set weights. - setInputs() sets the input activations. - trainNetwork() sets the
- * inputs, runs forward evaluation training, backpropagation, calculates weights, and calculates
- * error. If training hits the max number of iterations or the average error is less than the error
- * threshold, training ends. - runNetworkCalculations() calculates hidden and output neurons. -
- * forwardEvaluationTraining() calculates hidden neurons in forward evaluation. - backpropagation()
- * calculates the change of weights using the backpropagation algorithm. - runNetwork() runs over
- * all test cases. - reportResults() prints out training information if training, like error, and
- * number of iterations reached. It also prints out the truth table, the network's results, and time
- * for both running and training. - sigmoidFunction() calculates the value of a given input plugged
- * into the sigmoid function. - sigmoidDerivative() calculates the value of a given input plugged
- * into the derivative of the sigmoid function. - randomize() returns a random double between a
- * given min and max. - main() calls readParametersFile() if there is a file passed in at the
- * command line. Otherwise, it uses a default configuration file. It also calls
- * echoConfigParameters(), init(), populate(), trainOrRun(), and reportResults().
+ * Table of Contents: 
+ * - trainOrRun() determines whether the network is training or simply running. 
+ * - init() allocates space for aand initializes all of the arrays the network uses. 
+ * - echoConfigParameters() prints out the network configuration and other important parameters. 
+ * - scanInteger() takes in a String from an external file and returns an integer if present. 
+ * - scanDouble() takes in a String from an external file and returns a double if present. 
+ * - scanString() takes in a String from an external file, trims the whitespace and returns the
+ *   desired part of the String.
+ * - readParametersFile() goes through the external configuration file and stores everything in variables. 
+ * - saveWeightsFile() saves the final weights from training into an external file. 
+ * - populate() fills up the truth table and the weights array with either random or set weights. 
+ * - setInputs() sets the input activations. 
+ * - trainNetwork() sets the inputs, runs forward evaluation training, backpropagation, 
+ *   calculates weights, and calculates error. If training hits the max number of iterations or the 
+ *   average error is less than the error threshold, training ends. 
+ * - runNetworkCalculations() calculates hidden and output neurons. 
+ * - forwardEvaluationTraining() calculates hidden neurons in forward evaluation. 
+ * - backpropagation() calculates the change of weights using the backpropagation algorithm. 
+ * - runNetwork() runs over all test cases. 
+ * - reportResults() prints out training information if training, like error, and number of iterations reached. 
+ *   It also prints out the truth table, the network's results, and time for both running and training. 
+ * - sigmoidFunction() calculates the value of a given input plugged into the sigmoid function. 
+ * - sigmoidDerivative() calculates the value of a given input plugged into the derivative of the sigmoid function. 
+ * - activationFunction() calculates the value of a given input plugged into a given activation function.
+ * - activationDerivative() calculates the value of a given input plugged into a given activation function derivative.
+ * - randomize() returns a random double between a given min and max. 
+ * - main() calls readParametersFile() if there is a file passed in at the
+ *   command line. Otherwise, it uses a default configuration file. It also calls
+ *   echoConfigParameters(), init(), populate(), trainOrRun(), and reportResults().
  */
 
 public class NLayer
@@ -526,7 +533,7 @@ public class NLayer
             {
                tempTheta += weights[n][m][k] * activations[n][m];
             }
-            activations[n + 1][k] = sigmoidFunction(tempTheta);
+            activations[n + 1][k] = activationFunction(tempTheta);
          }
       }
    } // public void runNetworkCalculations()
@@ -548,7 +555,7 @@ public class NLayer
             {
                tempTheta += weights[n - 1][i][j] * activations[n - 1][i];
             }
-            activations[n][j] = sigmoidFunction(tempTheta);
+            activations[n][j] = activationFunction(tempTheta);
             theta[n][j] = tempTheta;
          } // for (int j = 0; j < numNodesInLayer[n]; j++)
       } // for (int n = 1; n < numLayers; n++)
@@ -557,15 +564,14 @@ public class NLayer
       for (int j = 0; j < numNodesInLayer[n]; j++)
       {
          tempTheta = 0.0;
-         tempOmega = 0.0;
 
          for (int i = 0; i < numNodesInLayer[n - 1]; i++)
          {
             tempTheta += weights[n - 1][i][j] * activations[n - 1][i];
          }
-         activations[n][j] = sigmoidFunction(tempTheta);
+         activations[n][j] = activationFunction(tempTheta);
          tempOmega = expectedTruthTable[index][j] - activations[n][j];
-         psi[n][j] = tempOmega * sigmoidDerivative(tempTheta);
+         psi[n][j] = tempOmega * activationDerivative(tempTheta);
       } // for (int j = 0; j < numNodesInLayer[n]; j++)
    } // public void forwardEvaluationTraining()
 
@@ -579,33 +585,33 @@ public class NLayer
 
       for (int n = numLayers - 2; n > 1; n--)
       {
-         tempOmega = 0.0;
          for (int j = 0; j < numNodesInLayer[n]; j++)
          {
+            tempOmega = 0.0;
             for (int i = 0; i < numNodesInLayer[n + 1]; i++)
             {
                tempOmega += psi[n + 1][i] * weights[n][j][i];
                weights[n][j][i] += lambda * activations[n][j] * psi[n + 1][i];
             }
-            psi[n][j] = tempOmega * sigmoidDerivative(theta[n][j]);
+            psi[n][j] = tempOmega * activationDerivative(theta[n][j]);
          }
       } // for (int n = numLayers - 2; n > 1; n--)
 
-      int x = INPUT_LAYER;
-      for (int m = 0; m < numNodesInLayer[x + 1]; m++)
+      int x = 1; // first hidden layer
+      for (int m = 0; m < numNodesInLayer[x]; m++)
       {
          tempOmega = 0.0;
-         for (int k = 0; k < numNodesInLayer[x + 2]; k++)
+         for (int k = 0; k < numNodesInLayer[x + 1]; k++)
          {
-            tempOmega += psi[x + 2][k] * weights[x + 1][m][k];
-            weights[x + 1][m][k] += lambda * activations[x + 1][m] * psi[x + 2][k];
+            tempOmega += psi[x + 1][k] * weights[x][m][k];
+            weights[x][m][k] += lambda * activations[x][m] * psi[x + 1][k];
          }
 
-         psi[x + 1][m] = tempOmega * sigmoidDerivative(theta[x + 1][m]);
+         psi[x][m] = tempOmega * activationDerivative(theta[x][m]);
 
          for (int k = 0; k < numInputs; k++)
          {
-            weights[x][k][m] += lambda * activations[x][m] * psi[x + 1][m];
+            weights[x - 1][k][m] += lambda * activations[x - 1][k] * psi[x][m];
          }
       }
    } // public void backpropagation(int index)
@@ -680,6 +686,24 @@ public class NLayer
       } // if (trainingOrRunning.equals("training"))
       saveWeightsFile();
    } // public void reportResults()
+
+   /*
+    * The activationFunction() method calls an activation function defined elsewhere in the class and
+    * returns its value.
+    */
+   public double activationFunction(double x)
+   {
+      return sigmoidFunction(x);
+   } // public double activationFunction(double x)
+
+   /*
+    * The activationDerivative() method calls an activation function's derivative defined elsewhere in
+    * the class and returns its value.
+    */
+   public double activationDerivative(double x)
+   {
+     return  sigmoidDerivative(x);
+   } // public double activationDerivative(double x)
 
    /*
     * The sigmoidFunction() method returns the value of a given x plugged into the sigmoid
